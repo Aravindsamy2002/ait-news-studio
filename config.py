@@ -29,8 +29,18 @@ COLOR_ACCENT_GOLD = "#F59E0B"       # Bloomberg Gold Ticker
 COLOR_TEXT_MAIN = "#F8FAFC"
 COLOR_TEXT_MUTED = "#94A3B8"
 
-# News Feeds
+# News Feeds (Real-time Silicon Valley & Global Wire)
 RSS_FEEDS = [
+    {
+        "name": "Techmeme Live Wire",
+        "url": "https://www.techmeme.com/feed.xml",
+        "default_category": "SILICON VALLEY BREAKING"
+    },
+    {
+        "name": "Google News Tech",
+        "url": "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-US&gl=US&ceid=US:en",
+        "default_category": "GLOBAL TECH WIRE"
+    },
     {
         "name": "TechCrunch AI",
         "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
@@ -45,11 +55,6 @@ RSS_FEEDS = [
         "name": "Ars Technica",
         "url": "https://feeds.arstechnica.com/arstechnica/index",
         "default_category": "CYBERSECURITY & DEV"
-    },
-    {
-        "name": "Hacker News",
-        "url": "https://news.ycombinator.com/rss",
-        "default_category": "DEVELOPER & SILICON"
     }
 ]
 
