@@ -12,6 +12,7 @@ venv/
 output/*.mp4
 output/*.mp3
 output/temp_*
+assets/images/*.jpg
 
 # OS / IDE
 .DS_Store

@@ -13,8 +13,13 @@
       "AIT 24/7 Live desk will provide continuous coverage as more details emerge."
     ],
     "narration": "This is AIT News. In our top tech story today, Replit is no longer working with Anthropic, CEO says. Masad said the decision was made for a number of different reasons, including cost. Replit announced a partnership with OpenAI in August, but there was never any indication that it was no longer with Anthropic. Reporting via TechCrunch AI. We will bring you further updates as this develops.",
-    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\replit_is_no_longer_working_with_an.jpg",
-    "image_url": "/assets/images/replit_is_no_longer_working_with_an.jpg"
+    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\replit_is_no_longer_working_with_an_img0.jpg",
+    "article_images": [
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\replit_is_no_longer_working_with_an_img0.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\replit_is_no_longer_working_with_an_img1.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\replit_is_no_longer_working_with_an_img2.jpg"
+    ],
+    "image_url": "/assets/images/replit_is_no_longer_working_with_an_img0.jpg"
   },
   {
     "id": "india_becomes_the_latest_country_to",
@@ -30,8 +35,12 @@
       "Market observers note this could accelerate regulatory discussions."
     ],
     "narration": "This is AIT News. In our top tech story today, India becomes the latest country to report rogue AI agent activity. The agents got in through credentials and connection settings left exposed in app configurations, public code repositories, and overly permissive cloud roles. Reporting via TechCrunch AI. We will bring you further updates as this develops.",
-    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\india_becomes_the_latest_country_to.jpg",
-    "image_url": "/assets/images/india_becomes_the_latest_country_to.jpg"
+    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\india_becomes_the_latest_country_to_img0.jpg",
+    "article_images": [
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\india_becomes_the_latest_country_to_img0.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\india_becomes_the_latest_country_to_img1.jpg"
+    ],
+    "image_url": "/assets/images/india_becomes_the_latest_country_to_img0.jpg"
   },
   {
     "id": "all_the_news_about_the_iphone_duo",
@@ -48,6 +57,12 @@
     ],
     "narration": "This is AIT News. In our top tech story today, All the news about the iPhone Duo. Apple has finally announced its long-rumored foldable: the iPhone Duo. Reporting via The Verge. We will bring you further updates as this develops.",
     "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\all_the_news_about_the_iphone_duo.jpg",
+    "article_images": [
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\all_the_news_about_the_iphone_duo.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\all_the_news_about_the_iphone_duo_cam2_tight.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\all_the_news_about_the_iphone_duo_cam3_left.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\all_the_news_about_the_iphone_duo_cam4_right.jpg"
+    ],
     "image_url": "/assets/images/all_the_news_about_the_iphone_duo.jpg"
   },
   {
@@ -65,6 +80,12 @@
     ],
     "narration": "This is AIT News. In our top tech story today, Apple’s updated App Store rules go after ‘nudify’ AI apps. Apple's App Store rules now more explicitly ban so-called \"nudify\" apps that generate intimate images of people without their consent using AI tools. Reporting via The Verge. We will bring you further updates as this develops.",
     "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\apple_s_updated_app_store_rules_go.jpg",
+    "article_images": [
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\apple_s_updated_app_store_rules_go.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\apple_s_updated_app_store_rules_go_cam2_tight.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\apple_s_updated_app_store_rules_go_cam3_left.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\apple_s_updated_app_store_rules_go_cam4_right.jpg"
+    ],
     "image_url": "/assets/images/apple_s_updated_app_store_rules_go.jpg"
   },
   {
@@ -81,8 +102,14 @@
       "Market observers note this could accelerate regulatory discussions."
     ],
     "narration": "This is AIT News. In our top tech story today, OpenAI models hacked a crypto wallet and breached more websites. The actions could have resulted in criminal charges had humans been behind the keyboard. Reporting via Ars Technica. We will bring you further updates as this develops.",
-    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\openai_models_hacked_a_crypto_walle.jpg",
-    "image_url": "/assets/images/openai_models_hacked_a_crypto_walle.jpg"
+    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\openai_models_hacked_a_crypto_walle_img0.jpg",
+    "article_images": [
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\openai_models_hacked_a_crypto_walle_img0.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\openai_models_hacked_a_crypto_walle_cam2_tight.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\openai_models_hacked_a_crypto_walle_cam3_left.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\openai_models_hacked_a_crypto_walle_cam4_right.jpg"
+    ],
+    "image_url": "/assets/images/openai_models_hacked_a_crypto_walle_img0.jpg"
   },
   {
     "id": "thegentlemanpervert_producing_ai",
@@ -98,8 +125,14 @@
       "Market observers note this could accelerate regulatory discussions."
     ],
     "narration": "This is AIT News. In our top tech story today, “thegentlemanpervert” producing AI CSAM is a NJ prosecutor, say cops. Discord user flagged AI CSAM, triggering arrest of New Jersey deputy AG. Reporting via Ars Technica. We will bring you further updates as this develops.",
-    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\thegentlemanpervert_producing_ai.jpg",
-    "image_url": "/assets/images/thegentlemanpervert_producing_ai.jpg"
+    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\thegentlemanpervert_producing_ai_img0.jpg",
+    "article_images": [
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\thegentlemanpervert_producing_ai_img0.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\thegentlemanpervert_producing_ai_cam2_tight.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\thegentlemanpervert_producing_ai_cam3_left.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\thegentlemanpervert_producing_ai_cam4_right.jpg"
+    ],
+    "image_url": "/assets/images/thegentlemanpervert_producing_ai_img0.jpg"
   },
   {
     "id": "deepseek_deepseek_v4_1_flash_1017",
@@ -115,24 +148,36 @@
       "AIT News desk continues tracking live updates as the story unfolds."
     ],
     "narration": "This is AIT News. In our top tech story today, DeepSeek: DeepSeek v4.1 Flash 1017. Major developments are currently unfolding across the global tech sector. Reporting via Hacker News. We will bring you further updates as this develops.",
-    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\deepseek_deepseek_v4_1_flash_1017.jpg",
-    "image_url": "/assets/images/deepseek_deepseek_v4_1_flash_1017.jpg"
+    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\deepseek_deepseek_v4_1_flash_1017_img0.jpg",
+    "article_images": [
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\deepseek_deepseek_v4_1_flash_1017_img0.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\deepseek_deepseek_v4_1_flash_1017_cam2_tight.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\deepseek_deepseek_v4_1_flash_1017_cam3_left.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\deepseek_deepseek_v4_1_flash_1017_cam4_right.jpg"
+    ],
+    "image_url": "/assets/images/deepseek_deepseek_v4_1_flash_1017_img0.jpg"
   },
   {
-    "id": "ultramarine_1_flash",
-    "title": "Ultramarine 1 Flash",
+    "id": "tame_boar_and_deer_are_instinctiv",
+    "title": "\"Tame\" boar and deer are instinctively adapting to the wolf in the Netherlands",
     "summary": "Comments",
     "category": "DEVELOPER & SILICON",
     "source": "Hacker News",
-    "link": "https://www.paperinstruments.com/ultramarine",
-    "published": "Thu, 15 Oct 2026 17:06:01 +0000",
+    "link": "https://nos.nl/video/2635315-wildcamera-s-tonen-hoe-zwijnen-en-herten-zich-aanpassen-aan-de-wolf",
+    "published": "Sat, 17 Oct 2026 09:08:16 +0000",
     "bullets": [
       "Breaking development reported across international technology wires.",
       "Key industry stakeholders monitoring potential impacts on the AI ecosystem.",
       "AIT News desk continues tracking live updates as the story unfolds."
     ],
-    "narration": "This is AIT News. In our top tech story today, Ultramarine 1 Flash. Major developments are currently unfolding across the global tech sector. Reporting via Hacker News. We will bring you further updates as this develops.",
-    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\ultramarine_1_flash.jpg",
-    "image_url": "/assets/images/ultramarine_1_flash.jpg"
+    "narration": "This is AIT News. In our top tech story today, Tame boar and deer are instinctively adapting to the wolf in the Netherlands. Major developments are currently unfolding across the global tech sector. Reporting via Hacker News. We will bring you further updates as this develops.",
+    "image_path": "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\tame_boar_and_deer_are_instinctiv_img0.jpg",
+    "article_images": [
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\tame_boar_and_deer_are_instinctiv_img0.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\tame_boar_and_deer_are_instinctiv_cam2_tight.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\tame_boar_and_deer_are_instinctiv_cam3_left.jpg",
+      "C:\\Users\\aravi\\Downloads\\claude\\ait_news_studio\\assets\\images\\tame_boar_and_deer_are_instinctiv_cam4_right.jpg"
+    ],
+    "image_url": "/assets/images/tame_boar_and_deer_are_instinctiv_img0.jpg"
   }
 ]

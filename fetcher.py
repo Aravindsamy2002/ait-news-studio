@@ -6,7 +6,7 @@ import urllib.request
 from datetime import datetime, timezone
 import feedparser
 from bs4 import BeautifulSoup
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 from config import RSS_FEEDS, OUTPUT_DIR, ASSETS_DIR
 
 CACHE_FILE = os.path.join(OUTPUT_DIR, "latest_news.json")
@@ -80,100 +80,149 @@ def generate_narration_script(title: str, summary: str, source: str) -> str:
     )
     return script
 
-def extract_feed_image_url(entry) -> str:
-    """Extract image URL directly from feed tags if present."""
-    if "media_content" in entry:
-        for m in entry.media_content:
+def scrape_article_image_urls(article_url: str, feed_entry) -> list[str]:
+    """Scrape ONLY genuine images used inside the article itself."""
+    found_urls = []
+
+    # 1. From RSS entry
+    if "media_content" in feed_entry:
+        for m in feed_entry.media_content:
             if "url" in m and m["url"].startswith("http"):
-                return m["url"]
-    if "enclosures" in entry:
-        for enc in entry.enclosures:
+                found_urls.append(m["url"])
+    if "enclosures" in feed_entry:
+        for enc in feed_entry.enclosures:
             if "href" in enc and enc["href"].startswith("http"):
-                return enc["href"]
-    if "links" in entry:
-        for l in entry.links:
-            if l.get("type", "").startswith("image/") and l.get("href"):
-                return l["href"]
-    return ""
+                found_urls.append(enc["href"])
 
-def fetch_article_og_image(article_url: str) -> str:
-    """Fetch OpenGraph image from article page with quick timeout."""
-    if not article_url or not article_url.startswith("http"):
-        return ""
-    try:
-        req = urllib.request.Request(
-            article_url,
-            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-        )
-        with urllib.request.urlopen(req, timeout=4) as resp:
-            html_doc = resp.read(150000).decode("utf-8", errors="ignore")
-            soup = BeautifulSoup(html_doc, "html.parser")
-            og_img = soup.find("meta", property="og:image") or soup.find("meta", attrs={"name": "twitter:image"})
-            if og_img and og_img.get("content"):
-                return og_img.get("content")
-    except Exception:
-        pass
-    return ""
-
-def generate_fallback_themed_image(output_path: str, category: str, title: str):
-    """Generate a modern cyber/tech graphic if no article photo is found."""
-    W, H = 1200, 800
-    img = Image.new("RGBA", (W, H), (15, 23, 42, 255))
-    draw = ImageDraw.Draw(img)
-
-    # Cyber grid
-    for x in range(0, W, 60):
-        draw.line([(x, 0), (x, H)], fill=(30, 41, 59, 120), width=1)
-    for y in range(0, H, 60):
-        draw.line([(0, y), (W, y)], fill=(30, 41, 59, 120), width=1)
-
-    # Radial glow
-    for r in range(350, 50, -40):
-        alpha = int((1 - r / 350) * 50)
-        draw.ellipse([(W//2 - r, H//2 - r), (W//2 + r, H//2 + r)], fill=(37, 99, 235, alpha))
-
-    font_path = "C:\\Windows\\Fonts\\segoeuib.ttf"
-    try:
-        font_cat = ImageFont.truetype(font_path, 40)
-        font_sub = ImageFont.truetype(font_path, 28)
-    except Exception:
-        font_cat = ImageFont.load_default()
-        font_sub = font_cat
-
-    draw.rounded_rectangle([(100, 100), (W - 100, H - 100)], radius=20, outline=(56, 189, 248, 180), width=3)
-    draw.text((140, 140), f"⚡ {category}", font=font_cat, fill=(248, 113, 113, 255))
-    draw.text((140, 220), "AIT NEWS LIVE REPORT FOOTAGE", font=font_sub, fill=(56, 189, 248, 255))
-
-    img.convert("RGB").save(output_path, "JPEG", quality=85)
-
-def cache_story_image(story_id: str, feed_img_url: str, article_link: str, category: str, title: str) -> str:
-    """Download and cache relevant story photo, or create fallback."""
-    local_path = os.path.join(IMAGES_DIR, f"{story_id}.jpg")
-    if os.path.exists(local_path) and os.path.getsize(local_path) > 3000:
-        return local_path
-
-    img_url = feed_img_url or fetch_article_og_image(article_link)
-    if img_url:
+    # 2. Scrape article page
+    if article_url and article_url.startswith("http"):
         try:
             req = urllib.request.Request(
-                img_url,
+                article_url,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+            )
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                soup = BeautifulSoup(resp.read(), "html.parser")
+
+            # Meta OG / Twitter image
+            for prop in ["og:image", "twitter:image"]:
+                m = soup.find("meta", property=prop) or soup.find("meta", attrs={"name": prop})
+                if m and m.get("content") and m.get("content").startswith("http"):
+                    u = m.get("content")
+                    if u not in found_urls:
+                        found_urls.append(u)
+
+            # Images in article content
+            for container in soup.find_all(["article", "main", "figure", "div"]):
+                c_class = " ".join(container.get("class", []))
+                if any(k in c_class for k in ["content", "article", "post", "body", "entry"]):
+                    for im in container.find_all("img"):
+                        src = im.get("src") or im.get("data-src") or ""
+                        if src.startswith("http"):
+                            # Filter out non-article visuals (avatars, headshots, icons, logos, svgs)
+                            is_junk = any(k in src.lower() for k in [
+                                "author", "headshot", "avatar", "profile", "logo",
+                                "icon", "pixel", "advert", "sponsor", ".svg", "button"
+                            ])
+                            if not is_junk and src not in found_urls:
+                                found_urls.append(src)
+        except Exception as e:
+            print(f"Error scraping article images from {article_url}: {e}")
+
+    # Remove duplicates and clean
+    unique = []
+    for u in found_urls:
+        if u not in unique and not u.endswith(".svg"):
+            unique.append(u)
+
+    return unique
+
+def generate_cinematic_crops_from_image(base_img_path: str, story_id: str) -> list[str]:
+    """When an article has 1 image, generate 4 cinematic camera angles strictly from that article image."""
+    paths = [base_img_path]
+    try:
+        img = Image.open(base_img_path).convert("RGB")
+        W, H = img.size
+
+        # CAM 2: Tight Close-up (center-top 65% of the photo)
+        cw, ch = int(W * 0.65), int(H * 0.65)
+        x0 = (W - cw) // 2
+        y0 = int(H * 0.08)
+        c2 = img.crop((x0, y0, x0 + cw, y0 + ch))
+        p2 = os.path.join(IMAGES_DIR, f"{story_id}_cam2_tight.jpg")
+        c2.save(p2, "JPEG", quality=90)
+        paths.append(p2)
+
+        # CAM 3: Medium Left / Action Focus
+        x0 = int(W * 0.05)
+        y0 = int(H * 0.12)
+        c3 = img.crop((x0, y0, x0 + cw, y0 + ch))
+        p3 = os.path.join(IMAGES_DIR, f"{story_id}_cam3_left.jpg")
+        c3.save(p3, "JPEG", quality=90)
+        paths.append(p3)
+
+        # CAM 4: Medium Right Focus
+        x0 = max(0, W - cw - int(W * 0.05))
+        y0 = int(H * 0.12)
+        c4 = img.crop((x0, y0, x0 + cw, y0 + ch))
+        p4 = os.path.join(IMAGES_DIR, f"{story_id}_cam4_right.jpg")
+        c4.save(p4, "JPEG", quality=90)
+        paths.append(p4)
+
+    except Exception as e:
+        print(f"Error generating angle crops: {e}")
+
+    return paths
+
+def fetch_and_cache_article_images(story_id: str, article_url: str, feed_entry) -> list[str]:
+    """Download and cache ONLY images used in the article itself."""
+    # Check if already cached
+    primary_path = os.path.join(IMAGES_DIR, f"{story_id}_img0.jpg")
+    if os.path.exists(primary_path) and os.path.getsize(primary_path) > 3000:
+        # Check existing angles/images
+        existing = [p for p in [
+            primary_path,
+            os.path.join(IMAGES_DIR, f"{story_id}_cam2_tight.jpg"),
+            os.path.join(IMAGES_DIR, f"{story_id}_cam3_left.jpg"),
+            os.path.join(IMAGES_DIR, f"{story_id}_cam4_right.jpg"),
+        ] if os.path.exists(p)]
+        if len(existing) >= 2:
+            return existing
+
+    image_urls = scrape_article_image_urls(article_url, feed_entry)
+    downloaded_paths = []
+
+    for idx, url in enumerate(image_urls[:4]):
+        out_p = os.path.join(IMAGES_DIR, f"{story_id}_img{idx}.jpg")
+        try:
+            req = urllib.request.Request(
+                url,
                 headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
             )
             with urllib.request.urlopen(req, timeout=5) as resp:
                 data = resp.read()
                 if len(data) > 3000:
-                    with open(local_path, "wb") as f:
+                    with open(out_p, "wb") as f:
                         f.write(data)
-                    return local_path
+                    downloaded_paths.append(out_p)
         except Exception as e:
-            print(f"Failed to download image {img_url}: {e}")
+            print(f"Failed to download article image {url}: {e}")
 
-    # Fallback graphic
-    generate_fallback_themed_image(local_path, category, title)
-    return local_path
+    # If only 1 image found in article, create 4 cinematic camera angles strictly from that photo
+    if len(downloaded_paths) == 1:
+        return generate_cinematic_crops_from_image(downloaded_paths[0], story_id)
+    elif len(downloaded_paths) > 1:
+        return downloaded_paths
+
+    # Fallback to existing image if any
+    old_p = os.path.join(IMAGES_DIR, f"{story_id}.jpg")
+    if os.path.exists(old_p) and os.path.getsize(old_p) > 3000:
+        return generate_cinematic_crops_from_image(old_p, story_id)
+
+    return []
 
 def fetch_all_news(limit_per_feed: int = 4) -> list[dict]:
-    """Fetch stories from all configured RSS feeds with images and scripts."""
+    """Fetch stories from all configured RSS feeds with genuine article images."""
     all_stories = []
 
     for feed_info in RSS_FEEDS:
@@ -200,9 +249,9 @@ def fetch_all_news(limit_per_feed: int = 4) -> list[dict]:
 
                 story_id = re.sub(r"[^a-zA-Z0-9]+", "_", title[:35]).strip("_").lower()
 
-                # Get image URL & cache photo
-                feed_img = extract_feed_image_url(entry)
-                image_path = cache_story_image(story_id, feed_img, link, category, title)
+                # Extract and download ONLY article's own images
+                article_images = fetch_and_cache_article_images(story_id, link, entry)
+                primary_image = article_images[0] if article_images else ""
 
                 all_stories.append({
                     "id": story_id,
@@ -214,8 +263,9 @@ def fetch_all_news(limit_per_feed: int = 4) -> list[dict]:
                     "published": published,
                     "bullets": bullets,
                     "narration": narration,
-                    "image_path": image_path,
-                    "image_url": f"/assets/images/{os.path.basename(image_path)}"
+                    "image_path": primary_image,
+                    "article_images": article_images,
+                    "image_url": f"/assets/images/{os.path.basename(primary_image)}" if primary_image else ""
                 })
         except Exception as e:
             print(f"Error fetching feed {name}: {e}")
@@ -243,6 +293,6 @@ def build_ticker_string(stories: list[dict], max_items: int = 12) -> str:
 
 if __name__ == "__main__":
     news = fetch_all_news(limit_per_feed=2)
-    print(f"Fetched {len(news)} stories with cached images!")
+    print(f"Fetched {len(news)} stories.")
     for s in news[:3]:
-        print(f"Story: {s['title'][:40]} | Img: {s['image_path']}")
+        print(f"Story: {s['title'][:40]} | Article Images: {len(s.get('article_images', []))}")

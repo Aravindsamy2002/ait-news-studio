@@ -30,37 +30,21 @@ def get_font(name: str, size: int) -> ImageFont.FreeTypeFont:
     return ImageFont.load_default()
 
 def get_story_image_pool(story: dict) -> list[str]:
-    """Gather multiple relevant images for the story including article photos and themed B-roll."""
-    pool = []
-    # Primary article photo
-    primary = story.get("image_path")
-    if primary and os.path.exists(primary):
-        pool.append(primary)
+    """Gather ONLY genuine images and camera angles from the article itself."""
+    article_imgs = story.get("article_images", [])
+    valid = [p for p in article_imgs if p and os.path.exists(p) and os.path.getsize(p) > 2000]
 
-    # Category-tailored B-roll footage
-    cat = story.get("category", "").upper()
-    broll_ai = os.path.join(BROLL_DIR, "broll_ai_processor.jpg")
-    broll_cyber = os.path.join(BROLL_DIR, "broll_cyber_defense.jpg")
-    broll_data = os.path.join(BROLL_DIR, "broll_datacenter_servers.jpg")
+    if not valid:
+        primary = story.get("image_path")
+        if primary and os.path.exists(primary) and os.path.getsize(primary) > 2000:
+            valid.append(primary)
 
-    if "CYBER" in cat or "DEFENSE" in cat:
-        order = [broll_cyber, broll_ai, broll_data]
-    elif "SILICON" in cat or "HARDWARE" in cat or "CHIP" in cat:
-        order = [broll_ai, broll_data, broll_cyber]
-    else:
-        order = [broll_ai, broll_cyber, broll_data]
-
-    for b in order:
-        if os.path.exists(b) and b not in pool:
-            pool.append(b)
-
-    # Fallback to preview_slide if pool is still empty
-    if not pool:
+    if not valid:
         fallback = os.path.join(OUTPUT_DIR, "preview_slide.png")
         if os.path.exists(fallback):
-            pool.append(fallback)
+            valid.append(fallback)
 
-    return pool
+    return valid
 
 def render_phase_slide(
     story: dict,
