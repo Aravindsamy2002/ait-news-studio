@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIT NEWS Studio • 24/7 AI & Tech Broadcast Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #070a13;
+      --bg-card: rgba(17, 24, 39, 0.85);
+      --bg-card-hover: rgba(30, 41, 59, 0.95);
+      --border-color: rgba(55, 65, 81, 0.6);
+      --border-glow: rgba(37, 99, 235, 0.4);
+      --red-bbc: #dc2626;
+      --red-glow: rgba(220, 38, 38, 0.4);
+      --blue-accent: #2563eb;
+      --cyan-neon: #38bdf8;
+      --gold-ticker: #f59e0b;
+      --text-white: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-white);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(220, 38, 38, 0.1) 0%, transparent 40%);
+    }
+
+    /* Studio Header */
+    header {
+      background: rgba(11, 15, 25, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--red-bbc);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-badge {
+      background: var(--red-bbc);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: 1px;
+      padding: 4px 12px;
+      border-radius: 4px;
+      box-shadow: 0 0 15px var(--red-glow);
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-pill {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse 1.5s infinite;
+    }
+
+    .pulse-dot.red {
+      background: var(--red-bbc);
+      box-shadow: 0 0 8px var(--red-bbc);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+    }
+
+    /* Main Container Grid */
+    .container {
+      max-width: 1600px;
+      margin: 24px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 1200px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cards */
+    .glass-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .card-title span.badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(37, 99, 235, 0.2);
+      color: var(--cyan-neon);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    /* Video Player Area */
+    .video-viewport {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .player-meta {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Buttons */
+    .btn {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-red {
+      background: linear-gradient(135deg, var(--red-bbc), #b91c1c);
+    }
+
+    .btn-red:hover {
+      box-shadow: 0 4px 15px var(--red-glow);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-white);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--cyan-neon);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 11px;
+    }
+
+    /* YouTube Meta Section */
+    .meta-box {
+      background: rgba(11, 15, 25, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .meta-label {
+      font-size: 11px;
+      color: var(--cyan-neon);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .meta-content {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .thumb-preview-img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 12px;
+    }
+
+    /* Story Feed Wire */
+    .feed-container {
+      max-height: 820px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .feed-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .feed-container::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 3px;
+    }
+
+    .story-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .story-card:hover {
+      border-color: var(--blue-accent);
+      background: var(--bg-card-hover);
+      transform: translateX(4px);
+    }
+
+    .story-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .category-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(220, 38, 38, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(220, 38, 38, 0.3);
+      text-transform: uppercase;
+    }
+
+    .story-source {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .story-title {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 10px;
+      color: #f1f5f9;
+    }
+
+    .story-bullets {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      padding-left: 14px;
+    }
+
+    .story-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Streaming Control Form */
+    .stream-panel {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    input[type="text"] {
+      background: rgba(11, 15, 25, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 9px 14px;
+      color: #fff;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      width: 100%;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--cyan-neon);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+
+    /* Modal / Alert Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      border: 1px solid var(--cyan-neon);
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 13px;
+      color: #fff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      display: none;
+      z-index: 1000;
+    }
+
+    .spin {
+      animation: rotate 1s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Studio Header -->
+  <header>
+    <div class="brand-group">
+      <div class="logo-badge">AIT</div>
+      <div>
+        <div class="brand-title">AIT NEWS STUDIO</div>
+        <div class="brand-subtitle">24/7 AI & Tech Broadcast Control Desk</div>
+      </div>
+    </div>
+
+    <div class="header-status">
+      <div class="status-pill">
+        <span class="pulse-dot"></span>
+        <span id="newsCount">News: 19 Active</span>
+      </div>
+      <div class="status-pill">
+        <span>🎙️ Anchor: Christopher (Neural)</span>
+      </div>
+      <div class="status-pill">
+        <span class="pulse-dot red"></span>
+        <span id="streamStatusText">Stream: Idle</span>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="refreshFeeds()">
+        🔄 Refresh Feeds
+      </button>
+      <button class="btn btn-red btn-sm" onclick="generateBulletin()">
+        ⚡ Render 3-Story Bulletin
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Studio Workspace -->
+  <div class="container">
+
+    <!-- LEFT COLUMN: Monitor & Stream Control -->
+    <div class="left-col">
+      <!-- Live Video Monitor Card -->
+      <div class="glass-card">
+        <div class="card-title">
+          <span>📺 LIVE BROADCAST MONITOR</span>
+          <span class="badge" id="videoResBadge">1080p @ 30FPS</span>
+        </div>
+
+        <div class="video-viewport">
+          <video id="broadcastPlayer" controls autoplay muted loop>
+            <source id="videoSource" src="/output/broadcast_replit_is_no_longer_working_with_an.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+
+        <div class="player-meta">
+          <span id="activeVideoTitle">▶️ Playing: Replit is no longer working with Anthropic</span>
+          <span id="videoDuration">Duration: ~28s • Mixed Ambient Bed</span>
+        </div>
+      </div>
+
+      <!-- YouTube Automation & Thumbnail Studio -->
+      <div class="glass-card">
+        <div class="card-title">
+          <span>🚀 YOUTUBE LIVE & METADATA AUTOMATION</span>
+          <span class="badge">ZERO-COST WORKFLOW</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 220px 1fr; gap: 16px;">
+          <div>
+            <img id="thumbImg" class="thumb-preview-img" src="/output/thumb_replit_is_no_longer_working_with_an.jpg" alt="Generated Thumbnail" onerror="this.src='/output/preview_thumb.jpg'">
+            <button class="btn btn-outline btn-sm" style="width: 100%; justify-content: center;" onclick="downloadThumbnail()">
+              📥 Download Thumbnail
+            </button>
+          </div>
+
+          <div>
+            <div class="meta-box">
+              <div class="meta-label">
+                <span>Optimized Video Title</span>
+                <a href="#" onclick="copyText('metaTitleText'); return false;" style="color:var(--cyan-neon); text-decoration:none;">Copy</a>
+              </div>
+              <div class="meta-content" id="metaTitleText">Replit is no longer working with Anthropic, CEO says | AIT NEWS 24/7 Global Tech Broadcast</div>
+            </div>
+
+            <div class="meta-box">
+              <div class="meta-label">
+                <span>Description & Chapters</span>
+                <a href="#" onclick="copyText('metaDescText'); return false;" style="color:var(--cyan-neon); text-decoration:none;">Copy</a>
+              </div>
+              <div class="meta-content" id="metaDescText">⚡ Replit is no longer working with Anthropic, CEO says
+Category: ARTIFICIAL INTELLIGENCE
+Source: TechCrunch AI
+
+Welcome to AIT NEWS — your 24/7 autonomous source for artificial intelligence, frontier technology, and global silicon developments.
+
+#AITNews #ArtificialIntelligence #TechNews #OpenAI #Tech</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 24/7 RTMP Streaming Controller -->
+        <div style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+          <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">
+            📡 Start 24/7 YouTube Live RTMP Stream
+          </div>
+          <div class="stream-panel">
+            <input type="text" id="streamKeyInput" placeholder="Enter your YouTube Stream Key (e.g., abcd-1234-efgh-5678)">
+            <button class="btn btn-red" id="streamToggleBtn" onclick="toggleStream()">
+              🔴 Go Live
+            </button>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+            Streams your rendered playlist in continuous high-bitrate loop using local FFmpeg. No extra software needed.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Real-Time Tech & AI Feed Wire -->
+    <div class="right-col">
+      <div class="glass-card">
+        <div class="card-title">
+          <span>⚡ LIVE TECH & AI WIRE</span>
+          <span class="badge" id="feedSourceBadge">TechCrunch • The Verge • Ars Technica</span>
+        </div>
+
+        <div class="feed-container" id="feedList">
+          <!-- Dynamic story cards inserted here -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast">Notification</div>
+
+  <!-- Audio element for quick voice audition -->
+  <audio id="audioAudition"></audio>
+
+  <script>
+    let currentNews = [];
+    let isStreaming = false;
+
+    // Toast popup
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3500);
+    }
+
+    // Copy helper
+    function copyText(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text);
+      showToast('Copied to clipboard!');
+    }
+
+    function downloadThumbnail() {
+      const img = document.getElementById('thumbImg');
+      window.open(img.src, '_blank');
+    }
+
+    // Load initial news
+    async function loadNews() {
+      try {
+        const res = await fetch('/api/news');
+        const data = await res.json();
+        currentNews = data;
+        renderFeedList(data);
+        document.getElementById('newsCount').innerText = `News: ${data.length} Active`;
+      } catch (err) {
+        console.error('Failed to load news:', err);
+      }
+    }
+
+    function renderFeedList(stories) {
+      const container = document.getElementById('feedList');
+      container.innerHTML = '';
+
+      stories.forEach((s, idx) => {
+        const card = document.createElement('div');
+        card.className = 'story-card';
+
+        const bulletsHtml = s.bullets.map(b => `<li>${b}</li>`).join('');
+        const imgHtml = s.image_url ? `<img src="${s.image_url}" style="width: 100%; max-height: 140px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--border-color);" alt="Story Photo" onerror="this.style.display='none'">` : '';
+
+        card.innerHTML = `
+          <div class="story-header">
+            <span class="category-tag">${s.category}</span>
+            <span class="story-source">${s.source}</span>
+          </div>
+          ${imgHtml}
+          <div class="story-title">${s.title}</div>
+          <ul class="story-bullets">${bulletsHtml}</ul>
+          <div class="story-actions">
+            <button class="btn btn-outline btn-sm" onclick="auditionVoice(${idx})">
+              🔊 Audition Voice
+            </button>
+            <button class="btn btn-red btn-sm" id="btn-render-${idx}" onclick="renderSingleStory(${idx})">
+              🎬 Render 1080p Clip
+            </button>
+            <a href="${s.link}" target="_blank" class="btn btn-outline btn-sm" style="margin-left:auto;">
+              🔗 Source
+            </a>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Audition voice
+    async function auditionVoice(idx) {
+      const story = currentNews[idx];
+      showToast(`Generating neural anchor voice for story #${idx + 1}...`);
+      try {
+        const res = await fetch('/api/audition-voice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: story.narration, id: story.id })
+        });
+        const data = await res.json();
+        if (data.audio_url) {
+          const audio = document.getElementById('audioAudition');
+          audio.src = data.audio_url + '?t=' + Date.now();
+          audio.play();
+          showToast('Playing anchor narration audio.');
+        }
+      } catch (err) {
+        showToast('Error generating audition audio.');
+      }
+    }
+
+    // Render single broadcast video
+    async function renderSingleStory(idx) {
+      const story = currentNews[idx];
+      const btn = document.getElementById(`btn-render-${idx}`);
+      const origText = btn.innerHTML;
+      btn.innerHTML = '⏳ Rendering...';
+      btn.disabled = true;
+      showToast(`Rendering 1080p BBC-style broadcast for: ${story.title.slice(0, 35)}...`);
+
+      try {
+        const res = await fetch('/api/generate-single', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ story_id: story.id })
+        });
+        const data = await res.json();
+
+        if (data.video_file) {
+          updateActivePlayer(data);
+          showToast('✅ Broadcast video rendered and loaded into monitor!');
+        } else {
+          showToast('Failed to render video: ' + (data.error || 'unknown'));
+        }
+      } catch (err) {
+        showToast('Error rendering video.');
+      } finally {
+        btn.innerHTML = origText;
+        btn.disabled = false;
+      }
+    }
+
+    // Render 3-story continuous bulletin
+    async function generateBulletin() {
+      showToast('⚡ Generating full 3-Story Continuous News Bulletin...');
+      try {
+        const res = await fetch('/api/generate-bulletin', { method: 'POST' });
+        const data = await res.json();
+        if (data.video_file) {
+          updateActivePlayer(data);
+          showToast('✅ Full Bulletin rendered and loaded into monitor!');
+        }
+      } catch (err) {
+        showToast('Error generating bulletin.');
+      }
+    }
+
+    function updateActivePlayer(data) {
+      const player = document.getElementById('broadcastPlayer');
+      const source = document.getElementById('videoSource');
+      source.src = `/output/${data.video_file}?t=` + Date.now();
+      player.load();
+      player.play();
+
+      document.getElementById('activeVideoTitle').innerText = `▶️ Playing: ${data.title || 'AIT Broadcast'}`;
+      if (data.duration) {
+        document.getElementById('videoDuration').innerText = `Duration: ${Math.round(data.duration)}s • 1080p 30FPS`;
+      }
+      if (data.thumb_file) {
+        document.getElementById('thumbImg').src = `/output/${data.thumb_file}?t=` + Date.now();
+      }
+      if (data.title) {
+        document.getElementById('metaTitleText').innerText = data.title;
+      }
+      if (data.description) {
+        document.getElementById('metaDescText').innerText = data.description;
+      }
+    }
+
+    // Refresh news feeds
+    async function refreshFeeds() {
+      showToast('🔄 Scraping latest Tech & AI RSS feeds...');
+      try {
+        const res = await fetch('/api/refresh', { method: 'POST' });
+        const data = await res.json();
+        currentNews = data;
+        renderFeedList(data);
+        document.getElementById('newsCount').innerText = `News: ${data.length} Active`;
+        showToast(`Refreshed! ${data.length} stories loaded.`);
+      } catch (err) {
+        showToast('Error refreshing feeds.');
+      }
+    }
+
+    // Stream Toggle
+    async function toggleStream() {
+      const btn = document.getElementById('streamToggleBtn');
+      const keyInput = document.getElementById('streamKeyInput');
+
+      if (!isStreaming) {
+        const key = keyInput.value.trim();
+        if (!key) {
+          alert('Please enter your YouTube Stream Key first!');
+          return;
+        }
+
+        showToast('🚀 Launching YouTube Live RTMP Stream...');
+        const res = await fetch('/api/stream/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stream_key: key })
+        });
+        const data = await res.json();
+        if (data.success) {
+          isStreaming = true;
+          btn.innerText = '⏹️ Stop Stream';
+          btn.className = 'btn btn-outline';
+          document.getElementById('streamStatusText').innerText = 'Stream: LIVE';
+          showToast('🔴 STREAMING LIVE TO YOUTUBE!');
+        } else {
+          showToast('Error: ' + data.error);
+        }
+      } else {
+        const res = await fetch('/api/stream/stop', { method: 'POST' });
+        const data = await res.json();
+        isStreaming = false;
+        btn.innerText = '🔴 Go Live';
+        btn.className = 'btn btn-red';
+        document.getElementById('streamStatusText').innerText = 'Stream: Idle';
+        showToast('Streaming stopped.');
+      }
+    }
+
+    window.onload = loadNews;
+  </script>
+</body>
+</html>

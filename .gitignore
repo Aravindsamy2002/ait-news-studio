@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Broadcast Output (Generated MP4/MP3)
+output/*.mp4
+output/*.mp3
+output/temp_*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.env
