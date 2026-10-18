@@ -3,50 +3,18 @@ import json
 import subprocess
 import imageio_ffmpeg
 from config import OUTPUT_DIR, DEFAULT_VOICE, CHANNEL_NAME
-from fetcher import get_cached_news, build_ticker_string
-from voice_engine import generate_speech
+from fetcher import get_cached_news, build_ticker_string, prepare_story
+from voice_engine import generate_segmented_speech
 from renderer import render_story_video, render_youtube_thumbnail
+from motion_renderer import LEAD_IN, TAIL, story_phase_count
+from analysis import with_analysis
+from youtube_uploader import build_metadata
 
 METADATA_FILE = os.path.join(OUTPUT_DIR, "broadcast_metadata.json")
 
 def generate_youtube_metadata(story: dict, duration: float) -> dict:
-    """Generate high-CTR, SEO-optimized title, description, and tags."""
-    title = f"{story['title']} | AIT NEWS 24/7 Global Tech Broadcast"
-    if len(title) > 95:
-        title = f"{story['title'][:70]}... | AIT NEWS"
-
-    cat = story.get("category", "TECH")
-    source = story.get("source", "AIT Global Desk")
-
-    description = f"""⚡ {story['title']}
-Category: {cat}
-Source: {source}
-
-Welcome to AIT NEWS — your 24/7 autonomous source for artificial intelligence, frontier technology, cybersecurity disclosures, and global silicon developments.
-
-📌 KEY HIGHLIGHTS:
-• {story['bullets'][0] if len(story['bullets']) > 0 else ''}
-• {story['bullets'][1] if len(story['bullets']) > 1 else ''}
-• {story['bullets'][2] if len(story['bullets']) > 2 else ''}
-
-🕒 Broadcast Duration: {int(duration)}s
-📡 Streamed 24/7 via AIT News Cloud Desk
-
-#AITNews #ArtificialIntelligence #TechNews #OpenAI #CyberSecurity #Silicon #BreakingNews #AI
-"""
-
-    tags = [
-        "AIT News", "Tech News", "Artificial Intelligence", "AI News",
-        "OpenAI", "Claude", "DeepSeek", "Nvidia", "Silicon",
-        "Cybersecurity", "Breaking Tech News", "24/7 Live Stream",
-        "Tech Wire", "Technology Updates", "Autonomous News"
-    ]
-
-    return {
-        "title": title,
-        "description": description,
-        "tags": tags
-    }
+    """Title, description and story-wise tags (same builder the YouTube uploader uses)."""
+    return build_metadata(story)
 
 def create_single_story_broadcast(story: dict, voice_key: str = DEFAULT_VOICE) -> dict:
     """Render a single breaking news broadcast video clip + thumbnail + metadata."""
@@ -59,9 +27,11 @@ def create_single_story_broadcast(story: dict, voice_key: str = DEFAULT_VOICE) -
     video_path = os.path.join(OUTPUT_DIR, video_file)
     thumb_path = os.path.join(OUTPUT_DIR, thumb_file)
 
-    # 1. Voice generation with sentence boundary timings
+    # 1. Clean headline/script, then voice each segment for exact graphic sync
+    story = with_analysis(prepare_story(story))
     print(f"Generating voice for: {story['title'][:40]}...")
-    audio_path, duration, timings = generate_speech(story["narration"], audio_file, voice_key=voice_key)
+    audio_path, duration, timings = generate_segmented_speech(story["narration_segments"], audio_file, voice_key=voice_key)
+    timings = timings[:story_phase_count(story)]
 
     # 2. News ticker
     all_news = get_cached_news()
@@ -75,6 +45,7 @@ def create_single_story_broadcast(story: dict, voice_key: str = DEFAULT_VOICE) -
     render_youtube_thumbnail(story, thumb_path)
 
     # 5. Metadata
+    duration += LEAD_IN + TAIL
     metadata = generate_youtube_metadata(story, duration)
     metadata["video_file"] = video_file
     metadata["audio_file"] = audio_file
@@ -104,14 +75,16 @@ def create_multi_story_bulletin(stories: list[dict], voice_key: str = DEFAULT_VO
         video_file = f"b_clip_{i}_{story_id}.mp4"
         video_path = os.path.join(OUTPUT_DIR, video_file)
 
-        audio_path, duration, timings = generate_speech(s["narration"], audio_file, voice_key=voice_key)
+        s = with_analysis(prepare_story(s))
+        audio_path, duration, timings = generate_segmented_speech(s["narration_segments"], audio_file, voice_key=voice_key)
+        timings = timings[:story_phase_count(s)]
         render_story_video(s, audio_path, duration, ticker, video_path, timings=timings)
 
         rendered_clips.append(video_path)
         mins = int(total_time // 60)
         secs = int(total_time % 60)
         chapters.append(f"{mins:02d}:{secs:02d} - {s['title']}")
-        total_time += duration
+        total_time += duration + LEAD_IN + TAIL
 
     # Concat file
     concat_txt_path = os.path.join(OUTPUT_DIR, "concat_list.txt")
@@ -136,7 +109,7 @@ def create_multi_story_bulletin(stories: list[dict], voice_key: str = DEFAULT_VO
     subprocess.run(cmd, check=True)
 
     # Thumbnail from lead story
-    lead = stories[0]
+    lead = prepare_story(stories[0])
     thumb_path = os.path.join(OUTPUT_DIR, "bulletin_thumb.jpg")
     render_youtube_thumbnail(lead, thumb_path)
 
@@ -147,7 +120,7 @@ def create_multi_story_bulletin(stories: list[dict], voice_key: str = DEFAULT_VO
 Chapters:
 {chapter_text}
 
-Welcome to AIT NEWS, broadcasting continuous 24/7 AI and technology intelligence.
+The day's biggest technology and AI stories from AIT NEWS.
 
 #AITNews #AINews #TechNews #OpenAI #TechRecap #DailyTech
 """

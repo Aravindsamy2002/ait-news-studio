@@ -67,13 +67,40 @@ Open your browser at **`http://127.0.0.1:8765`**.
 
 ## ☁️ Deploying on Oracle Cloud Free Tier (24/7 Streaming)
 
-1. Provision an **Oracle Cloud Free VM** (Ampere A1 ARM or AMD E2.1.Micro with Ubuntu).
-2. Install Python 3.11+, FFmpeg, and clone this repository.
-3. Run with systemd or tmux:
+Target: **Ampere A1 (ARM64), 4 OCPU / 24 GB, Ubuntu 22.04 or 24.04**. Everything runs on the free tier:
+Kokoro TTS and the Ollama analysis model run locally on the CPU, and the stream uses about 1.5 TB/month
+of the 10 TB free egress.
+
+1. Clone the repository on the VM, then run the one-time setup:
    ```bash
-   nohup python app.py > studio.log 2>&1 &
+   bash deploy/setup_oracle.sh
    ```
-4. Enter your YouTube Stream Key in the dashboard and click **"Go Live"** for continuous 24/7 autonomous streaming!
+   It installs FFmpeg, a Python venv, Ollama (`qwen2.5:3b`), the Kokoro voice model and an `ait-news` systemd service.
+2. Put your stream key in `/etc/ait-news/env` (`YOUTUBE_STREAM_KEY=...`).
+3. `sudo systemctl start ait-news` and follow the log with `journalctl -u ait-news -f`.
+
+How the autopilot (`autopilot.py`) keeps the stream alive:
+- **Scheduler**: refreshes the feeds every 15 minutes and picks the on-air rotation (breaking stories first, then newest; stories without a real article image are skipped).
+- **Render queue**: 3 worker processes render missing clips in the background. Each story version is rendered once and cached in `output/clips/`. A story that stops being "breaking" after 2 hours is re-rendered without the BREAKING graphics.
+- **Streamer**: one FFmpeg process pushes to YouTube with `-c copy` (no re-encoding), splicing clips from the rotation. A standby slate plays until the first clip is ready, so there is never dead air.
+
+Dry run without YouTube: `python autopilot.py --output test.flv --minutes 5`
+
+### YouTube uploads and live title (optional, free API quota)
+
+Once a token exists, the autopilot also uploads each new story as its own video (title, description with
+source link, story-wise tags, News category, BBC-style thumbnail; paced: max 4/day, 2 hours apart) and keeps the 24/7
+stream titled after the top story ("AIT News LIVE: ...").
+
+1. Google Cloud Console → new project → enable **YouTube Data API v3**.
+2. OAuth consent screen: External, add your Google account as a user, then set publishing status to
+   **In production** (in "Testing", refresh tokens expire after 7 days).
+3. Credentials → Create OAuth client ID → **Desktop app** → download `client_secret.json`.
+4. On your PC: `python youtube_uploader.py auth --client-secret client_secret.json` (sign in as the AIT News channel).
+5. Copy `secrets/youtube_token.json` to the same path on the VM, then check: `python youtube_uploader.py whoami`.
+
+Preview what would be uploaded: `python youtube_uploader.py preview`.
+Settings (env): `YOUTUBE_UPLOADS`, `YOUTUBE_LIVE_TITLE`, `YOUTUBE_PRIVACY`, `YOUTUBE_MAX_UPLOADS_PER_DAY`.
 
 ---
 

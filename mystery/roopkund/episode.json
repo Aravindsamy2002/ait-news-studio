@@ -1,0 +1,292 @@
+{
+  "title": "The Lake of Skeletons",
+  "subtitle": "Roopkund, India",
+  "series": "MYSTERY FILES",
+  "sources": [
+    "https://en.wikipedia.org/wiki/Roopkund",
+    "Harney et al. (2019), Ancient DNA from the skeletons of Roopkund Lake reveals Mediterranean migrants in India, Nature Communications 10, 3670"
+  ],
+  "scenes": [
+    {
+      "type": "photo",
+      "img": "skeletons",
+      "move": "in",
+      "grade": "cold",
+      "beats": [
+        [
+          "High in the Himalayas, there is a lake that keeps a secret.",
+          0.5
+        ],
+        [
+          "Every summer, when the ice melts...",
+          0.6
+        ],
+        [
+          "it gives back the dead.",
+          1.1
+        ]
+      ]
+    },
+    {
+      "type": "photo",
+      "img": "lake2",
+      "move": "out",
+      "grade": "cold",
+      "beats": [
+        [
+          "Hundreds of them.",
+          1.2
+        ]
+      ]
+    },
+    {
+      "type": "title",
+      "boom": true,
+      "beats": [
+        [
+          "",
+          3.4
+        ]
+      ]
+    },
+    {
+      "type": "chapter",
+      "num": "CHAPTER ONE",
+      "name": "THE DISCOVERY",
+      "beats": [
+        [
+          "",
+          2.2
+        ]
+      ]
+    },
+    {
+      "type": "map",
+      "lon": 79.732,
+      "lat": 30.262,
+      "label": "ROOPKUND",
+      "sub": "UTTARAKHAND, INDIA  ·  ~5,000 M",
+      "beats": [
+        [
+          "Nineteen forty-two. Uttarakhand, in the Indian Himalayas.",
+          0.5
+        ],
+        [
+          "A forest ranger named H. K. Madhwal climbs to a small glacial lake called Roopkund.",
+          0.6
+        ],
+        [
+          "It sits about five thousand meters above sea level.",
+          0.8
+        ]
+      ]
+    },
+    {
+      "type": "photo",
+      "img": "lake",
+      "move": "left",
+      "grade": "cold",
+      "caption": "ROOPKUND LAKE",
+      "beats": [
+        [
+          "What he finds there is hard to believe.",
+          0.5
+        ],
+        [
+          "Bones. Skulls. Scattered along the shore...",
+          0.5
+        ],
+        [
+          "and frozen into the ice below.",
+          1.0
+        ]
+      ]
+    },
+    {
+      "type": "chapter",
+      "num": "CHAPTER TWO",
+      "name": "THE THEORIES",
+      "beats": [
+        [
+          "",
+          2.2
+        ]
+      ]
+    },
+    {
+      "type": "theory",
+      "img": "panorama",
+      "tag": "THEORY 01",
+      "head": "Lost Soldiers of World War II",
+      "stamp": "DISPROVED",
+      "stamp_color": "red",
+      "beats": [
+        [
+          "At first, British officials feared these were Japanese soldiers, who had slipped into India during the war.",
+          0.5
+        ],
+        [
+          "But the bones were far too old.",
+          1.0
+        ]
+      ]
+    },
+    {
+      "type": "theory",
+      "img": "rajjat",
+      "tag": "LEGEND",
+      "head": "The King Who Angered a Goddess",
+      "stamp": "LEGEND",
+      "stamp_color": "gold",
+      "beats": [
+        [
+          "Local folk songs tell another story.",
+          0.4
+        ],
+        [
+          "A king and his royal party, on a pilgrimage to the goddess Nanda Devi...",
+          0.4
+        ],
+        [
+          "struck down by a storm of hail, as hard as iron.",
+          1.0
+        ]
+      ]
+    },
+    {
+      "type": "theory",
+      "img": "trishul_nanda",
+      "tag": "THEORY 02",
+      "head": "A Deadly Hailstorm",
+      "stamp": "THEORY",
+      "stamp_color": "amber",
+      "beats": [
+        [
+          "Strangely, science seemed to agree.",
+          0.5
+        ],
+        [
+          "In two thousand four, researchers found skulls with deep, rounded wounds...",
+          0.4
+        ],
+        [
+          "as if something hard had struck them from above.",
+          0.5
+        ],
+        [
+          "Like giant hailstones.",
+          1.0
+        ]
+      ]
+    },
+    {
+      "type": "chapter",
+      "num": "CHAPTER THREE",
+      "name": "THE TWIST",
+      "beats": [
+        [
+          "",
+          2.2
+        ]
+      ]
+    },
+    {
+      "type": "timeline",
+      "events": [
+        [
+          "1942",
+          "Skeletons found"
+        ],
+        [
+          "2004",
+          "Hailstorm theory"
+        ],
+        [
+          "2019",
+          "DNA study"
+        ]
+      ],
+      "beats": [
+        [
+          "Then, in twenty nineteen, a DNA study changed everything.",
+          0.6
+        ],
+        [
+          "The people of Roopkund did not die together.",
+          1.0
+        ]
+      ]
+    },
+    {
+      "type": "data",
+      "big": "1,000",
+      "unit": "YEARS APART",
+      "note": "7th–10th century  vs  ~1800 CE",
+      "boom": true,
+      "beats": [
+        [
+          "Most were South Asians, who died between the seventh and tenth centuries.",
+          0.5
+        ],
+        [
+          "But one group died only around eighteen hundred...",
+          0.6
+        ],
+        [
+          "about a thousand years later.",
+          1.0
+        ]
+      ]
+    },
+    {
+      "type": "photo",
+      "img": "skeletons",
+      "move": "in",
+      "grade": "cold",
+      "caption": "DNA: EASTERN MEDITERRANEAN ANCESTRY",
+      "beats": [
+        [
+          "And here is the strangest part.",
+          0.6
+        ],
+        [
+          "Their DNA matched people from the eastern Mediterranean...",
+          0.4
+        ],
+        [
+          "like Greece and Crete.",
+          1.2
+        ]
+      ]
+    },
+    {
+      "type": "photo",
+      "img": "trek3",
+      "move": "out",
+      "grade": "dusk",
+      "beats": [
+        [
+          "So how did they end up at a frozen lake in the Himalayas...",
+          0.5
+        ],
+        [
+          "and what killed them there?",
+          0.9
+        ],
+        [
+          "Nobody knows. Not yet.",
+          1.0
+        ]
+      ]
+    },
+    {
+      "type": "outro",
+      "beats": [
+        [
+          "What do you think happened at Roopkund? Tell us in the comments.",
+          2.0
+        ]
+      ]
+    }
+  ]
+}

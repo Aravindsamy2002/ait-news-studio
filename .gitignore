@@ -20,3 +20,24 @@ Thumbs.db
 .vscode/
 .idea/
 .env
+
+# Kokoro TTS model files (downloaded automatically)
+assets/models/
+output/clips/
+output/analysis_cache.json
+output/clip_audio_*
+secrets/
+client_secret*.json
+output/youtube_uploads.json
+output/thumbs/
+output/bulletins/
+output/script_cache.json
+
+# Generated previews / scratch renders
+output/preview/
+output/*.jpg
+output/concat_list.txt
+mystery/*/build/
+mystery/*/preview.mp4
+mystery/*/_frames.jpg
+mystery/*/img/_contact.jpg

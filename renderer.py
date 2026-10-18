@@ -1,13 +1,11 @@
 import os
-import subprocess
 from datetime import datetime, timezone
 from PIL import Image, ImageDraw, ImageFont
-import imageio_ffmpeg
 from config import (
     VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_FPS,
     OUTPUT_DIR, ASSETS_DIR, CHANNEL_NAME, CHANNEL_TAGLINE
 )
-from assets_builder import ensure_ambient_bed
+from motion_renderer import render_animated_story, render_thumbnail, story_phase_count
 
 BROLL_DIR = os.path.join(ASSETS_DIR, "broll")
 
@@ -218,23 +216,18 @@ def render_phase_slide(
     img.save(output_image_path, "PNG")
     return output_image_path
 
-def compute_phase_durations(total_duration: float, timings: list[dict] = None) -> list[float]:
-    """Calculate exact voice-synced durations for Phase 0 (Intro), Phase 1, Phase 2, Phase 3."""
-    if timings and len(timings) >= 4:
-        # Use exact sentence boundaries
-        t_intro = max(4.0, timings[1]["end"])
-        t_p1 = max(t_intro + 3.0, timings[2]["end"])
-        t_p2 = max(t_p1 + 3.0, timings[3]["end"])
-        
-        d0 = t_intro
-        d1 = t_p1 - t_intro
-        d2 = t_p2 - t_p1
-        d3 = max(3.0, total_duration - t_p2)
-        return [d0, d1, d2, d3]
-    else:
-        # Fallback to 4 balanced phases
-        seg = total_duration / 4.0
-        return [seg, seg, seg, total_duration - (seg * 3)]
+def compute_phase_durations(total_duration: float, timings: list[dict] = None, n_phases: int = 4) -> list[float]:
+    """Voice-synced phase lengths: intro/headline, then one phase per key point.
+
+    `timings` holds one {"start", "end"} entry per phase (from segmented narration);
+    each phase runs until the next one starts, the last until the audio ends.
+    """
+    if timings:
+        starts = [0.0] + [seg["start"] for seg in timings[1:]]
+        ends = starts[1:] + [total_duration]
+        return [max(0.5, e - s) for s, e in zip(starts, ends)]
+    seg = total_duration / n_phases
+    return [seg] * (n_phases - 1) + [total_duration - seg * (n_phases - 1)]
 
 def render_story_video(
     story: dict,
@@ -244,174 +237,11 @@ def render_story_video(
     output_video_path: str,
     timings: list[dict] = None
 ) -> str:
-    """Render full voice-synchronized broadcast with multiple camera images and text highlights."""
-    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
-    ambient_bed = ensure_ambient_bed()
-
-    # 1. Get multiple images
-    image_pool = get_story_image_pool(story)
-    # Ensure at least 4 items in pool by wrapping around
-    while len(image_pool) < 4:
-        image_pool.extend(image_pool)
-
-    # 2. Compute phase durations
-    durations = compute_phase_durations(duration, timings)
-
-    # 3. Render 4 individual video segments (each with its own slide state & image)
-    segment_files = []
-    temp_files = []
-
-    clean_ticker = ticker_text.replace(":", "\\:").replace("'", "").replace("%", "\\%")
-    font_path = "C\\:/Windows/Fonts/segoeuib.ttf"
-
-    for i in range(4):
-        active_idx = -1 if i == 0 else (i - 1)
-        phase_slide = os.path.join(OUTPUT_DIR, f"temp_phase_{story['id']}_{i}.png")
-        render_phase_slide(story, active_idx, phase_slide)
-        temp_files.append(phase_slide)
-
-        phase_img = image_pool[i % len(image_pool)]
-        seg_video = os.path.join(OUTPUT_DIR, f"temp_seg_{story['id']}_{i}.mp4")
-        temp_files.append(seg_video)
-
-        seg_dur = durations[i]
-        frames = int(seg_dur * VIDEO_FPS) + 20
-
-        # Alternate Ken Burns zoom in vs zoom out across cameras
-        if i % 2 == 0:
-            z_expr = "min(zoom+0.0007,1.15)"
-        else:
-            z_expr = "max(1.15-zoom*0.0006,1.0)"
-
-        vf = (
-            f"[1:v]scale=1200:800,zoompan=z='{z_expr}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s=760x730:fps=30[zoomed_img];"
-            f"[0:v][zoomed_img]overlay=1080:130[vout]"
-        )
-
-        cmd_seg = [
-            ffmpeg_exe, "-y",
-            "-loop", "1", "-i", phase_slide,
-            "-loop", "1", "-i", phase_img,
-            "-filter_complex", vf,
-            "-map", "[vout]",
-            "-t", f"{seg_dur:.2f}",
-            "-c:v", "libx264", "-preset", "ultrafast",
-            "-pix_fmt", "yuv420p",
-            seg_video
-        ]
-        subprocess.run(cmd_seg, check=True)
-        segment_files.append(seg_video)
-
-    # 4. Concatenate visual segments
-    concat_txt = os.path.join(OUTPUT_DIR, f"temp_concat_{story['id']}.txt")
-    temp_files.append(concat_txt)
-    with open(concat_txt, "w") as f:
-        for s in segment_files:
-            p_esc = os.path.abspath(s).replace("\\", "/")
-            f.write(f"file '{p_esc}'\n")
-
-    joined_video = os.path.join(OUTPUT_DIR, f"temp_joined_{story['id']}.mp4")
-    temp_files.append(joined_video)
-    cmd_join = [
-        ffmpeg_exe, "-y",
-        "-f", "concat", "-safe", "0",
-        "-i", concat_txt,
-        "-c", "copy",
-        joined_video
-    ]
-    subprocess.run(cmd_join, check=True)
-
-    # 5. Composite Joined Video + Live Audio Waveform + Scrolling Ticker + Ambient Bed Mix
-    final_filter = (
-        f"[1:a]showwaves=s=550x45:mode=line:colors=0x38BDF8[waveform];"
-        f"[0:v][waveform]overlay=440:795[v_wave];"
-        f"[v_wave]drawtext=fontfile='{font_path}':text='{clean_ticker}':x=w-t*200:y=1025:fontsize=28:fontcolor=0xFEF08A:shadowcolor=black@0.8:shadowx=2:shadowy=2[vout];"
-        f"[2:a]volume=0.18[bg];[1:a][bg]amix=inputs=2:duration=first[aout]"
-    )
-
-    cmd_final = [
-        ffmpeg_exe, "-y",
-        "-i", joined_video,
-        "-i", audio_path,
-        "-stream_loop", "-1", "-i", ambient_bed,
-        "-filter_complex", final_filter,
-        "-map", "[vout]", "-map", "[aout]",
-        "-c:v", "libx264", "-preset", "veryfast",
-        "-c:a", "aac", "-b:a", "192k",
-        "-pix_fmt", "yuv420p",
-        "-shortest",
-        output_video_path
-    ]
-    subprocess.run(cmd_final, check=True)
-
-    # Clean up temporary files
-    for tf in temp_files:
-        if os.path.exists(tf):
-            try:
-                os.remove(tf)
-            except Exception:
-                pass
-
-    return output_video_path
+    """Render the full voice-synchronized broadcast with news-channel motion graphics."""
+    n_phases = story_phase_count(story)
+    durations = compute_phase_durations(duration, timings, n_phases)
+    return render_animated_story(story, audio_path, duration, ticker_text, output_video_path, durations)
 
 def render_youtube_thumbnail(story: dict, output_thumb_path: str) -> str:
-    """Render high-CTR 1280x720 YouTube thumbnail featuring the story image."""
-    W, H = 1280, 720
-    img = Image.new("RGBA", (W, H), (11, 15, 25, 255))
-
-    image_pool = get_story_image_pool(story)
-    if image_pool and os.path.exists(image_pool[0]):
-        try:
-            photo = Image.open(image_pool[0]).convert("RGBA")
-            photo = photo.resize((W, H), Image.Resampling.LANCZOS)
-            img.paste(photo, (0, 0))
-        except Exception:
-            pass
-
-    overlay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    d_over = ImageDraw.Draw(overlay)
-    for x in range(0, W):
-        alpha = int(255 * (1.0 - (x / (W * 0.85)))) if x < (W * 0.85) else 0
-        d_over.line([(x, 0), (x, H)], fill=(7, 10, 19, min(255, alpha + 60)))
-    img = Image.alpha_composite(img, overlay)
-
-    draw = ImageDraw.Draw(img)
-    draw.rectangle([(0, 0), (W, 25)], fill=(220, 38, 38, 255))
-
-    font_logo = get_font("arialbd.ttf", 36)
-    font_badge = get_font("segoeuib.ttf", 26)
-    font_title = get_font("segoeuib.ttf", 46)
-    font_sub = get_font("segoeuib.ttf", 28)
-
-    draw.rectangle([(40, 50), (140, 105)], fill=(220, 38, 38, 255))
-    draw.text((55, 55), "AIT", font=font_logo, fill=(255, 255, 255, 255))
-    draw.text((155, 58), "NEWS", font=font_logo, fill=(255, 255, 255, 255))
-
-    draw.rounded_rectangle([(40, 135), (320, 185)], radius=10, fill=(220, 38, 38, 255))
-    draw.text((55, 142), "🚨 BREAKING AI", font=font_badge, fill=(255, 255, 255, 255))
-
-    headline = story.get("title", "")
-    words = headline.split()
-    lines = []
-    cur = []
-    for w in words:
-        cur.append(w)
-        bbox = draw.textbbox((0, 0), " ".join(cur), font=font_title)
-        if (bbox[2] - bbox[0]) > (W * 0.65):
-            cur.pop()
-            lines.append(" ".join(cur))
-            cur = [w]
-    if cur:
-        lines.append(" ".join(cur))
-
-    ty = 220
-    for l in lines[:4]:
-        draw.text((40, ty), l, font=font_title, fill=(255, 255, 255, 255))
-        ty += 60
-
-    draw.rectangle([(0, H - 75), (W, H)], fill=(15, 23, 42, 255))
-    draw.line([(0, H - 75), (W, H - 75)], fill=(245, 158, 11, 255), width=3)
-    draw.text((40, H - 55), f"24/7 AI GLOBAL DESK • SOURCE: {story.get('source', 'GLOBAL').upper()}", font=font_sub, fill=(254, 240, 138, 255))
-
-    img.convert("RGB").save(output_thumb_path, "JPEG", quality=92)
-    return output_thumb_path
+    """Render a 1280x720 YouTube thumbnail in the broadcast style."""
+    return render_thumbnail(story, output_thumb_path)
